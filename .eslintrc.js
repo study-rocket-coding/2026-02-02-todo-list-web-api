@@ -58,5 +58,7 @@ module.exports = {
         allow: ["users"],
       },
     ],
+
+    "no-unused-vars": "warn",
   },
 };

@@ -69,8 +69,10 @@ function checkLoginForTodoPage() {
         // token 無效，清除並跳轉到登入頁面
         localStorage.removeItem("token");
         location.href = "index.html";
+      } else {
+        // token 有效，顯示使用者名稱
+        displayUserNickname(data.nickname);
       }
-      // token 有效，不做任何事（繼續停留在待辦頁面）
     })
     .catch((err) => {
       console.error(err);
@@ -110,6 +112,14 @@ function checkLoginForIndexPage() {
       console.error(err);
       localStorage.removeItem("token");
     });
+}
+
+// 顯示使用者名稱
+function displayUserNickname(nickname) {
+  const userNameElement = document.getElementById("todoUser");
+  if (userNameElement) {
+    userNameElement.textContent = `${nickname || "使用者"}的代辦`;
+  }
 }
 
 // 註冊功能
