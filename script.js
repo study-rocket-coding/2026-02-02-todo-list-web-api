@@ -1,8 +1,7 @@
 let todos = [];
 let isLoading = false;
+const API_BASE = "https://todolist-api.hexschool.io/users";
 const API_URL = "https://todolist-api.hexschool.io/todos";
-const token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiItT2w1WVdVczYxM2pBenRKUE4xUCIsIm5pY2tuYW1lIjoiZXhhbXBsZTIyNSIsImlhdCI6MTc3MDcxMDM2MCwiZXhwIjoxNzcwOTY5NTYwfQ.v00eV63R9dLaxoM-ipbsK4zrIKL8fDWifjP8GFtdlok";
 
 const todoList = document.getElementById("todoList");
 const text = document.querySelector(".text");
@@ -30,6 +29,36 @@ function hideLoading() {
   createTodo.style.cursor = "pointer";
 }
 
+// 取得 token
+function getToken() {
+  return localStorage.getItem("token");
+}
+
+// 註冊功能
+function signUp() {
+  const email = document.querySelector("#email").value;
+  const password = document.querySelector("#password").value;
+  const nickname = document.querySelector("#nickname").value;
+
+  fetch(`${API_BASE}/sign_up`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password, nickname }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.status) {
+        alert("註冊成功，請登入");
+        location.href = "index.html";
+      } else {
+        alert(data.message);
+      }
+    });
+}
+
 // 取得資料
 function fetchTodos() {
   showLoading();
@@ -37,8 +66,8 @@ function fetchTodos() {
   fetch(`${API_URL}/`, {
     method: "GET",
     headers: {
-      accept: "application/json",
-      authorization: token,
+      Accept: "application/json",
+      Authorization: getToken(),
     },
   })
     .then((res) => res.json())
@@ -126,7 +155,7 @@ function createTodoItem(e) {
     method: "POST",
     headers: {
       Accept: "application/json",
-      Authorization: token,
+      Authorization: getToken(),
       "Content-Type": "application/json",
     },
     body: JSON.stringify(obj),
@@ -169,7 +198,7 @@ function deleteTodoItem(e) {
     method: "DELETE",
     headers: {
       accept: "application/json",
-      authorization: token,
+      authorization: getToken(),
     },
   })
     .then(() => {
@@ -232,7 +261,7 @@ function toggleTodoStatus(e) {
     method: "PATCH",
     headers: {
       Accept: "application/json",
-      Authorization: token,
+      Authorization: getToken(),
     },
     body: JSON.stringify({
       status: newCompleted,
