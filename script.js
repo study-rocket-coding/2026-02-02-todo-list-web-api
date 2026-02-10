@@ -59,6 +59,35 @@ function signUp() {
     });
 }
 
+// 登入功能
+function signIn() {
+  const email = document.querySelector("#email").value;
+  const password = document.querySelector("#password").value;
+
+  fetch(`${API_BASE}/sign_in`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.status) {
+        alert("登入成功");
+        localStorage.setItem("token", data.token);
+        location.href = "todoListPage.html";
+      } else {
+        alert(data.message);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      alert("登入失敗，請稍後再試");
+    });
+}
+
 // 取得資料
 function fetchTodos() {
   showLoading();
