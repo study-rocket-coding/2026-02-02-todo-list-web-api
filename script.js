@@ -1,7 +1,6 @@
 let todos = [];
 let isLoading = false;
-const API_BASE = "https://todolist-api.hexschool.io/users";
-const API_URL = "https://todolist-api.hexschool.io/todos";
+const API_BASE = "https://todolist-api.hexschool.io";
 
 const todoList = document.getElementById("todoList");
 const text = document.querySelector(".text");
@@ -57,7 +56,7 @@ function checkLoginForTodoPage() {
   }
 
   // 有 token，驗證是否有效
-  fetch(`${API_BASE}/checkout`, {
+  fetch(`${API_BASE}/users/checkout`, {
     method: "GET",
     headers: {
       Accept: "application/json",
@@ -90,7 +89,7 @@ function checkLoginForIndexPage() {
   }
 
   // 有 token，驗證是否有效
-  fetch(`${API_BASE}/checkout`, {
+  fetch(`${API_BASE}/users/checkout`, {
     method: "GET",
     headers: {
       Accept: "application/json",
@@ -119,7 +118,7 @@ function signUp() {
   const password = document.querySelector("#password").value;
   const nickname = document.querySelector("#nickname").value;
 
-  fetch(`${API_BASE}/sign_up`, {
+  fetch(`${API_BASE}/users/sign_up`, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -143,7 +142,7 @@ function signIn() {
   const email = document.querySelector("#email").value;
   const password = document.querySelector("#password").value;
 
-  fetch(`${API_BASE}/sign_in`, {
+  fetch(`${API_BASE}/users/sign_in`, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -171,7 +170,7 @@ function signIn() {
 function signOut(e) {
   e.preventDefault();
 
-  fetch(`${API_BASE}/sign_out`, {
+  fetch(`${API_BASE}/users/sign_out`, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -200,7 +199,7 @@ logoutBtn.addEventListener("click", signOut);
 function fetchTodos() {
   showLoading();
 
-  fetch(`${API_URL}/`, {
+  fetch(`${API_BASE}/todos/`, {
     method: "GET",
     headers: {
       Accept: "application/json",
@@ -285,7 +284,7 @@ function createTodoItem(e) {
     content: todoItem,
   };
 
-  fetch(`${API_URL}/`, {
+  fetch(`${API_BASE}/todos/`, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -328,7 +327,7 @@ function deleteTodoItem(e) {
 
   const id = deleteBtn.getAttribute("data-id");
 
-  fetch(`${API_URL}/${id}`, {
+  fetch(`${API_BASE}/todos/${id}`, {
     method: "DELETE",
     headers: {
       accept: "application/json",
@@ -391,7 +390,7 @@ function toggleTodoStatus(e) {
 
   const newCompleted = !todos[index].status;
 
-  fetch(`${API_URL}/${id}/toggle`, {
+  fetch(`${API_BASE}/todos/${id}/toggle`, {
     method: "PATCH",
     headers: {
       Accept: "application/json",
