@@ -119,14 +119,16 @@ function createTodoItem(e) {
   showLoading();
 
   const obj = {
-    id: String(Date.now()), // 使用 Date.now() 生成唯一 id
     content: todoItem,
-    status: false, // 預設為未完成
   };
 
   fetch(API_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      Accept: "application/json",
+      Authorization: token,
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify(obj),
   })
     .then((res) => res.json())
