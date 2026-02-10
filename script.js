@@ -1,6 +1,6 @@
 let todos = [];
 let isLoading = false;
-const API_URL = "https://todolist-api.hexschool.io/todos/";
+const API_URL = "https://todolist-api.hexschool.io/todos";
 const token =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiItT2w1WVdVczYxM2pBenRKUE4xUCIsIm5pY2tuYW1lIjoiZXhhbXBsZTIyNSIsImlhdCI6MTc3MDcxMDM2MCwiZXhwIjoxNzcwOTY5NTYwfQ.v00eV63R9dLaxoM-ipbsK4zrIKL8fDWifjP8GFtdlok";
 
@@ -34,7 +34,7 @@ function hideLoading() {
 function fetchTodos() {
   showLoading();
 
-  fetch(API_URL, {
+  fetch(`${API_URL}/`, {
     method: "GET",
     headers: {
       accept: "application/json",
@@ -122,7 +122,7 @@ function createTodoItem(e) {
     content: todoItem,
   };
 
-  fetch(API_URL, {
+  fetch(`${API_URL}/`, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -228,10 +228,11 @@ function toggleTodoStatus(e) {
 
   const newCompleted = !todos[index].status;
 
-  fetch(`${API_URL}/${id}`, {
+  fetch(`${API_URL}/${id}/toggle`, {
     method: "PATCH",
     headers: {
-      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: token,
     },
     body: JSON.stringify({
       status: newCompleted,
