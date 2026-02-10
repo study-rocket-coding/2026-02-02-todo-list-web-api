@@ -1,12 +1,11 @@
 let todos = [];
 let isLoading = false;
-const API_URL = "https://todolist-api.hexschool.io/todos";
-const token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiItT2w1WVdVczYxM2pBenRKUE4xUCIsIm5pY2tuYW1lIjoiZXhhbXBsZTIyNSIsImlhdCI6MTc3MDcxMDM2MCwiZXhwIjoxNzcwOTY5NTYwfQ.v00eV63R9dLaxoM-ipbsK4zrIKL8fDWifjP8GFtdlok";
+const API_BASE = "https://todolist-api.hexschool.io";
 
 const todoList = document.getElementById("todoList");
 const text = document.querySelector(".text");
 const createTodo = document.querySelector(".create_todo");
+const logoutBtn = document.getElementById("logoutBtn");
 
 // Loading 狀態
 function showLoading() {
@@ -30,15 +29,191 @@ function hideLoading() {
   createTodo.style.cursor = "pointer";
 }
 
+// 取得 token
+function getToken() {
+  return localStorage.getItem("token");
+}
+
+// 初始化
+if (todoList) {
+  // 在待辦事項頁面
+  checkLoginForTodoPage();
+  fetchTodos();
+} else {
+  // 在登入頁面
+  checkLoginForIndexPage();
+}
+
+// 待辦頁面的登入狀態驗證
+function checkLoginForTodoPage() {
+  const token = getToken();
+
+  if (!token) {
+    alert("請先登入");
+    // 沒有 token，跳轉到登入頁面
+    location.href = "index.html";
+    return;
+  }
+
+  // 有 token，驗證是否有效
+  fetch(`${API_BASE}/users/checkout`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: token,
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (!data.status) {
+        // token 無效，清除並跳轉到登入頁面
+        localStorage.removeItem("token");
+        location.href = "index.html";
+      } else {
+        // token 有效，顯示使用者名稱
+        displayUserNickname(data.nickname);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      localStorage.removeItem("token");
+      location.href = "index.html";
+    });
+}
+
+// 登入頁面的登入狀態驗證
+function checkLoginForIndexPage() {
+  const token = getToken();
+
+  if (!token) {
+    // 沒有 token，停留在登入頁面
+    return;
+  }
+
+  // 有 token，驗證是否有效
+  fetch(`${API_BASE}/users/checkout`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: token,
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.status) {
+        // token 有效，跳轉到待辦頁面
+        location.href = "todoListPage.html";
+      } else {
+        // token 無效，清除並停留在登入頁面
+        localStorage.removeItem("token");
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      localStorage.removeItem("token");
+    });
+}
+
+// 顯示使用者名稱
+function displayUserNickname(nickname) {
+  const userNameElement = document.getElementById("todoUser");
+  if (userNameElement) {
+    userNameElement.textContent = `${nickname || "使用者"}的代辦`;
+  }
+}
+
+// 註冊功能
+function signUp() {
+  const email = document.querySelector("#email").value;
+  const password = document.querySelector("#password").value;
+  const nickname = document.querySelector("#nickname").value;
+
+  fetch(`${API_BASE}/users/sign_up`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password, nickname }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.status) {
+        alert("註冊成功，請登入");
+        location.href = "index.html";
+      } else {
+        alert(data.message);
+      }
+    });
+}
+
+// 登入功能
+function signIn() {
+  const email = document.querySelector("#email").value;
+  const password = document.querySelector("#password").value;
+
+  fetch(`${API_BASE}/users/sign_in`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.status) {
+        alert("登入成功");
+        localStorage.setItem("token", data.token);
+        location.href = "todoListPage.html";
+      } else {
+        alert(data.message);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      alert("登入失敗，請稍後再試");
+    });
+}
+
+// 登出功能
+function signOut(e) {
+  e.preventDefault();
+
+  fetch(`${API_BASE}/users/sign_out`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      Authorization: getToken(),
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.status) {
+        localStorage.removeItem("token");
+        alert("成功登出");
+        location.href = "index.html";
+      } else {
+        alert("登出失敗：" + data.message);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      alert("登出失敗，請稍後再試");
+    });
+}
+
+logoutBtn.addEventListener("click", signOut);
+
 // 取得資料
 function fetchTodos() {
   showLoading();
 
-  fetch(`${API_URL}/`, {
+  fetch(`${API_BASE}/todos/`, {
     method: "GET",
     headers: {
-      accept: "application/json",
-      authorization: token,
+      Accept: "application/json",
+      Authorization: getToken(),
     },
   })
     .then((res) => res.json())
@@ -55,9 +230,6 @@ function fetchTodos() {
       hideLoading();
     });
 }
-
-// 初始渲染
-fetchTodos();
 
 // 渲染列表
 function renderData() {
@@ -122,11 +294,11 @@ function createTodoItem(e) {
     content: todoItem,
   };
 
-  fetch(`${API_URL}/`, {
+  fetch(`${API_BASE}/todos/`, {
     method: "POST",
     headers: {
       Accept: "application/json",
-      Authorization: token,
+      Authorization: getToken(),
       "Content-Type": "application/json",
     },
     body: JSON.stringify(obj),
@@ -165,11 +337,11 @@ function deleteTodoItem(e) {
 
   const id = deleteBtn.getAttribute("data-id");
 
-  fetch(`${API_URL}/${id}`, {
+  fetch(`${API_BASE}/todos/${id}`, {
     method: "DELETE",
     headers: {
       accept: "application/json",
-      authorization: token,
+      authorization: getToken(),
     },
   })
     .then(() => {
@@ -228,11 +400,11 @@ function toggleTodoStatus(e) {
 
   const newCompleted = !todos[index].status;
 
-  fetch(`${API_URL}/${id}/toggle`, {
+  fetch(`${API_BASE}/todos/${id}/toggle`, {
     method: "PATCH",
     headers: {
       Accept: "application/json",
-      Authorization: token,
+      Authorization: getToken(),
     },
     body: JSON.stringify({
       status: newCompleted,
