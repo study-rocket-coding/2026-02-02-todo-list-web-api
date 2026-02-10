@@ -35,6 +35,84 @@ function getToken() {
   return localStorage.getItem("token");
 }
 
+// 初始化
+if (todoList) {
+  // 在待辦事項頁面
+  checkLoginForTodoPage();
+  fetchTodos();
+} else {
+  // 在登入頁面
+  checkLoginForIndexPage();
+}
+
+// 待辦頁面的登入狀態驗證
+function checkLoginForTodoPage() {
+  const token = getToken();
+
+  if (!token) {
+    alert("請先登入");
+    // 沒有 token，跳轉到登入頁面
+    location.href = "index.html";
+    return;
+  }
+
+  // 有 token，驗證是否有效
+  fetch(`${API_BASE}/checkout`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: token,
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (!data.status) {
+        // token 無效，清除並跳轉到登入頁面
+        localStorage.removeItem("token");
+        location.href = "index.html";
+      }
+      // token 有效，不做任何事（繼續停留在待辦頁面）
+    })
+    .catch((err) => {
+      console.error(err);
+      localStorage.removeItem("token");
+      location.href = "index.html";
+    });
+}
+
+// 登入頁面的登入狀態驗證
+function checkLoginForIndexPage() {
+  const token = getToken();
+
+  if (!token) {
+    // 沒有 token，停留在登入頁面
+    return;
+  }
+
+  // 有 token，驗證是否有效
+  fetch(`${API_BASE}/checkout`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      Authorization: token,
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.status) {
+        // token 有效，跳轉到待辦頁面
+        location.href = "todoListPage.html";
+      } else {
+        // token 無效，清除並停留在登入頁面
+        localStorage.removeItem("token");
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      localStorage.removeItem("token");
+    });
+}
+
 // 註冊功能
 function signUp() {
   const email = document.querySelector("#email").value;
@@ -143,9 +221,6 @@ function fetchTodos() {
       hideLoading();
     });
 }
-
-// 初始渲染
-fetchTodos();
 
 // 渲染列表
 function renderData() {
