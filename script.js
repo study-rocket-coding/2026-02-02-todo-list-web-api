@@ -1,6 +1,8 @@
 let todos = [];
 let isLoading = false;
-const API_URL = "http://localhost:3000/todos";
+const API_URL = "https://todolist-api.hexschool.io/todos/";
+const token =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiItT2w1WVdVczYxM2pBenRKUE4xUCIsIm5pY2tuYW1lIjoiZXhhbXBsZTIyNSIsImlhdCI6MTc3MDcxMDM2MCwiZXhwIjoxNzcwOTY5NTYwfQ.v00eV63R9dLaxoM-ipbsK4zrIKL8fDWifjP8GFtdlok";
 
 const todoList = document.getElementById("todoList");
 const text = document.querySelector(".text");
@@ -32,10 +34,17 @@ function hideLoading() {
 function fetchTodos() {
   showLoading();
 
-  fetch(API_URL)
+  fetch(API_URL, {
+    method: "GET",
+    headers: {
+      accept: "application/json",
+      authorization: token,
+    },
+  })
     .then((res) => res.json())
     .then((data) => {
-      todos = data;
+      todos = data.data;
+      todos = Array.isArray(data.data) ? data.data : [];
       renderData();
     })
     .catch((err) => {
@@ -81,7 +90,7 @@ function renderData() {
 
   filteredData.forEach(function (todo) {
     const li = document.createElement("li");
-    const isCompleted = todo.completed;
+    const isCompleted = todo.status;
 
     li.innerHTML = filteredTemplate(isCompleted, todo);
 
@@ -112,7 +121,7 @@ function createTodoItem(e) {
   const obj = {
     id: String(Date.now()), // 使用 Date.now() 生成唯一 id
     content: todoItem,
-    completed: false, // 預設為未完成
+    status: false, // 預設為未完成
   };
 
   fetch(API_URL, {
@@ -183,9 +192,9 @@ function getFilteredData() {
 
   switch (status) {
     case "pending":
-      return todos.filter((todo) => !todo.completed);
+      return todos.filter((todo) => !todo.status);
     case "completed":
-      return todos.filter((todo) => todo.completed);
+      return todos.filter((todo) => todo.status);
     case "all":
     default:
       return todos;
@@ -211,7 +220,7 @@ function toggleTodoStatus(e) {
     return;
   }
 
-  const newCompleted = !todos[index].completed;
+  const newCompleted = !todos[index].status;
 
   fetch(`${API_URL}/${id}`, {
     method: "PATCH",
@@ -219,11 +228,11 @@ function toggleTodoStatus(e) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      completed: newCompleted,
+      status: newCompleted,
     }),
   })
     .then(() => {
-      todos[index].completed = newCompleted;
+      todos[index].status = newCompleted;
       renderData();
     })
     .catch((err) => {
@@ -254,7 +263,7 @@ filterTabs.addEventListener("click", function (e) {
 
 // 更新完成數量功能
 function updateCompletedCount() {
-  const completedCount = todos.filter((todo) => todo.completed).length;
+  const completedCount = todos.filter((todo) => todo.status).length;
   const countEl = document.getElementById("completed-count");
   countEl.textContent = completedCount;
 }
