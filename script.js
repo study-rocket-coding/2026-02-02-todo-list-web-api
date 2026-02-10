@@ -6,6 +6,7 @@ const API_URL = "https://todolist-api.hexschool.io/todos";
 const todoList = document.getElementById("todoList");
 const text = document.querySelector(".text");
 const createTodo = document.querySelector(".create_todo");
+const logoutBtn = document.getElementById("logoutBtn");
 
 // Loading 狀態
 function showLoading() {
@@ -87,6 +88,35 @@ function signIn() {
       alert("登入失敗，請稍後再試");
     });
 }
+
+// 登出功能
+function signOut(e) {
+  e.preventDefault();
+
+  fetch(`${API_BASE}/sign_out`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      Authorization: getToken(),
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.status) {
+        localStorage.removeItem("token");
+        alert("成功登出");
+        location.href = "index.html";
+      } else {
+        alert("登出失敗：" + data.message);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      alert("登出失敗，請稍後再試");
+    });
+}
+
+logoutBtn.addEventListener("click", signOut);
 
 // 取得資料
 function fetchTodos() {
