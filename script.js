@@ -167,6 +167,10 @@ function deleteTodoItem(e) {
 
   fetch(`${API_URL}/${id}`, {
     method: "DELETE",
+    headers: {
+      accept: "application/json",
+      authorization: token,
+    },
   })
     .then(() => {
       // API 刪除成功後，再更新本地陣列
