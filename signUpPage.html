@@ -12,13 +12,13 @@
     ></script>
 
     <link rel="stylesheet" href="style.css" />
-    <title>Login Page | ToDo List</title>
+    <title>Sign Up Page | ToDo List</title>
   </head>
 
   <body>
-    <!-- login_page -->
-    <div id="loginPage" class="bg-yellow">
-      <div class="conatiner loginPage vhContainer">
+    <!-- sign up -->
+    <div id="signUpPage" class="bg-yellow">
+      <div class="conatiner signUpPage vhContainer">
         <div class="side">
           <a href="#"
             ><img class="logoImg" src="./assets/logoImg.png" alt="logoImg"
@@ -27,7 +27,7 @@
         </div>
         <div>
           <form class="formControls" action="index.html">
-            <h2 class="formControls_txt">最實用的線上代辦事項服務</h2>
+            <h2 class="formControls_txt">註冊帳號</h2>
             <label class="formControls_label" for="email">Email</label>
             <input
               class="formControls_input"
@@ -37,7 +37,14 @@
               placeholder="請輸入 email"
               required
             />
-            <span>此欄位不可留空</span>
+            <label class="formControls_label" for="name">您的暱稱</label>
+            <input
+              class="formControls_input"
+              type="text"
+              name="name"
+              id="name"
+              placeholder="請輸入您的暱稱"
+            />
             <label class="formControls_label" for="pwd">密碼</label>
             <input
               class="formControls_input"
@@ -47,13 +54,22 @@
               placeholder="請輸入密碼"
               required
             />
+            <label class="formControls_label" for="pwd">再次輸入密碼</label>
+            <input
+              class="formControls_input"
+              type="password"
+              name="pwd"
+              id="pwd"
+              placeholder="請再次輸入密碼"
+              required
+            />
             <input
               class="formControls_btnSubmit"
               type="button"
               onclick="javascript: location.href = '#todoListPage';"
-              value="登入"
+              value="註冊帳號"
             />
-            <a class="formControls_btnLink" href="/signUpPage.html">註冊帳號</a>
+            <a class="formControls_btnLink" href="/index.html">登入</a>
           </form>
         </div>
       </div>
